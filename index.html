@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Kyle's Job Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#161412;--surface:#211e1b;--surface-2:#2e2a26;--line:#7d7367;--ink:#f2ede4;--muted:#b3a999;
+  --brass:#c9a45c;--burgundy:#7a2e3a;--burgundy-text:#d0677a;--flare:#ff6b3d;--good:#8fc48a;--on-burgundy:#f2ede4;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#f7f3ec;--surface:#ffffff;--surface-2:#efe8dc;--line:#8a7f72;--ink:#1d1a17;--muted:#5c5349;
+    --brass:#8a6a24;--burgundy:#7a2e3a;--burgundy-text:#7a2e3a;--flare:#b83d12;--good:#2f6b2a;
+    color-scheme:light;
+  }
+}
+:root[data-theme="light"]{
+  --bg:#f7f3ec;--surface:#ffffff;--surface-2:#efe8dc;--line:#8a7f72;--ink:#1d1a17;--muted:#5c5349;
+  --brass:#8a6a24;--burgundy:#7a2e3a;--burgundy-text:#7a2e3a;--flare:#b83d12;--good:#2f6b2a;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 "Barlow",system-ui,sans-serif;font-variant-numeric:tabular-nums}
+.wrap{max-width:1400px;margin-inline:auto;padding-inline:16px;padding-block:24px 40px}
+.wrap>*{min-width:0}
+h1,h2,h3,.lbl,.num,button,.pill,.chip,label.lbl{font-family:"Barlow Condensed","Arial Narrow",sans-serif}
+h1{margin:0;font-weight:800;font-size:clamp(36px,9vw,64px);line-height:1;text-transform:uppercase;letter-spacing:1px}
+.sub{margin:8px 0 0;color:var(--muted)}
+.stripe{height:10px;margin-block:16px 20px;background:repeating-linear-gradient(-45deg,var(--brass) 0 8px,var(--burgundy) 8px 16px)}
+.lbl{text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:14px;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 20px;padding:0;list-style:none}
+@media(min-width:800px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))}}
+.stat{background:var(--surface);border:1px solid var(--line);padding:8px 12px;min-width:0}
+.stat .num{display:block;font-weight:700;font-size:26px;line-height:1.1;color:var(--ink)}
+.stat .num small{font-size:16px;color:var(--muted);font-weight:600}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:flex-end;margin-bottom:20px;padding:12px;background:var(--surface);border:1px solid var(--line)}
+.ctl{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ctl.grow{flex:1 1 220px}
+input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:2px;padding:8px 10px;min-height:40px;width:100%;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-weight:600;font-size:15px;letter-spacing:1px;text-transform:uppercase;background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:6px 12px;min-height:36px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--brass);color:var(--bg);border-color:var(--brass)}
+.chk{display:flex;align-items:center;gap:8px;min-height:40px}
+.chk input{width:20px;height:20px;accent-color:var(--brass)}
+:focus-visible{outline:3px solid var(--flare);outline-offset:2px}
+.grid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin:0;padding:0;list-style:none}
+@media(min-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1200px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:0;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card.done{opacity:.55}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.score{display:flex;align-items:baseline;gap:4px}
+.score .num{font-weight:800;font-size:44px;line-height:1}
+.score.hi .num{color:var(--brass)}.score.mid .num{color:var(--ink)}.score.lo .num{color:var(--muted)}
+.pill{font-weight:700;font-size:14px;letter-spacing:1px;text-transform:uppercase;border-radius:999px;padding:2px 10px;border:1px solid transparent}
+.pill.IT{background:var(--brass);color:var(--bg)}
+.pill.Office{border-color:var(--ink);color:var(--ink)}
+.pill.Nonprofit{background:var(--burgundy);color:var(--on-burgundy)}
+.pill.Food{background:var(--surface-2);color:var(--muted)}
+.src{margin-left:auto}
+.card h3{margin:0;font-weight:700;font-size:22px;line-height:1.15;overflow-wrap:anywhere}
+.card h3 a{color:var(--ink);text-decoration-color:var(--brass);text-underline-offset:3px}
+.co{margin:0;color:var(--muted);overflow-wrap:anywhere}
+.facts{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0;padding:0;list-style:none;font-size:15px}
+.facts li{min-width:0;overflow-wrap:anywhere}
+.c-Hard{color:var(--flare);font-weight:600}.c-Easy{color:var(--good);font-weight:600}.c-other{color:var(--muted)}
+.why{margin:0;overflow-wrap:anywhere}
+.tags{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tags .lbl{margin-right:2px}
+.tag{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:1px 10px;color:var(--ink)}
+.gaps{margin:0;color:var(--muted);font-size:15px;overflow-wrap:anywhere}
+.note{margin:0;font-size:14px;color:var(--muted);background:var(--surface-2);padding:6px 10px}
+.foot{display:flex;gap:8px;margin-top:auto;padding-top:4px;flex-wrap:wrap}
+.btn{font-weight:700;font-size:16px;letter-spacing:1px;text-transform:uppercase;border-radius:2px;padding:8px 18px;min-height:40px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;border:1px solid var(--brass)}
+.btn.primary{background:var(--brass);color:var(--bg)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost[aria-pressed=true]{background:var(--good);color:var(--bg);border-color:var(--good)}
+.empty,.err{background:var(--surface);border:1px solid var(--line);padding:24px;text-align:center}
+.err{border-color:var(--flare)}
+.err h2{margin:0 0 6px;font-size:26px;text-transform:uppercase;letter-spacing:1px;color:var(--flare)}
+.kw{margin-top:32px}
+.kw h2{font-weight:800;font-size:32px;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px}
+.kwgrid{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+@media(min-width:800px){.kwgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.kwcol{background:var(--surface);border:1px solid var(--line);padding:16px;min-width:0}
+.kwcol h3{margin:0 0 10px;font-size:20px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.callout{margin-top:12px;background:var(--surface-2);border:1px solid var(--burgundy-text);padding:16px}
+.callout .lbl{color:var(--burgundy-text)}
+.callout p{margin:4px 0 0}
+.pfoot{margin:32px 0 0;color:var(--muted);font-size:14px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Kyle's Job Board</h1>
+    <p class="sub" id="subline">Loading today's list...</p>
+  </header>
+  <div class="stripe" aria-hidden="true"></div>
+  <main>
+    <ul class="stats" id="stats" hidden></ul>
+    <div class="controls" id="controls" hidden>
+      <div class="ctl grow"><label class="lbl" for="q">Search title or company</label><input type="search" id="q" autocomplete="off"></div>
+      <div class="ctl"><span class="lbl" id="l-source">Source</span><div class="chips" role="group" aria-labelledby="l-source" id="g-source"></div></div>
+      <div class="ctl"><span class="lbl" id="l-cat">Category</span><div class="chips" role="group" aria-labelledby="l-cat" id="g-cat"></div></div>
+      <div class="ctl"><span class="lbl" id="l-mode">Mode</span><div class="chips" role="group" aria-labelledby="l-mode" id="g-mode"></div></div>
+      <div class="ctl"><label class="chk lbl" for="hide"><input type="checkbox" id="hide"> Hide applied</label></div>
+      <div class="ctl"><label class="lbl" for="sort">Sort</label><select id="sort"><option value="score">Best match</option><option value="new">Newest</option></select></div>
+    </div>
+    <p class="lbl" id="count" aria-live="polite" hidden></p>
+    <ul class="grid" id="list"></ul>
+    <div class="empty" id="empty" hidden>No jobs match these filters.</div>
+    <div class="err" id="err" hidden role="alert"><h2>Nothing to show yet</h2><p>Today's list didn't load. Refresh the page; if it keeps failing, the morning update may still be running.</p></div>
+    <section class="kw" id="kw" hidden aria-labelledby="kwh">
+      <h2 id="kwh">Resume keywords</h2>
+      <div class="kwgrid">
+        <div class="kwcol"><h3>Your strengths</h3><div class="tags" id="k-str"></div></div>
+        <div class="kwcol"><h3>Add for IT roles</h3><div class="tags" id="k-it"></div></div>
+        <div class="kwcol"><h3>Add for office roles</h3><div class="tags" id="k-off"></div></div>
+      </div>
+      <div class="callout"><span class="lbl">Tip</span><p id="k-tip"></p></div>
+    </section>
+  </main>
+  <p class="pfoot">Refreshed every morning around 7 AM. Onsite jobs are limited to bus-reachable Pittsburgh (about an hour or less from the South Side). Scores weigh role fit, resume keyword overlap, bus commute, pay vs $17/hr floor, and posting age.</p>
+</div>
+<script>
+(function(){
+  var $=function(id){return document.getElementById(id)};
+  var KA='kyle-jobs-applied',KF='kyle-jobs-filter';
+  var jobs=[],applied={},F={q:'',source:'All',cat:'All',mode:'All',hide:false,sort:'score'};
+  function sget(k){try{return localStorage.getItem(k)}catch(e){return null}}
+  function sset(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+  function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+  try{applied=JSON.parse(sget(KA)||'{}')||{}}catch(e){applied={}}
+  try{var s=JSON.parse(sget(KF)||'null');if(s&&typeof s==='object')for(var k in F)if(k in s&&typeof s[k]===typeof F[k])F[k]=s[k]}catch(e){}
+  function jid(j){return j.url||(j.title+'|'+j.company)}
+  function safe(u){return /^https?:\/\//i.test(u||'')?u:'#'}
+  function isDate(p){return /^\d{4}-\d\d-\d\d$/.test(p||'')}
+  function saveF(){sset(KF,JSON.stringify(F))}
+  function nApplied(){return jobs.filter(function(j){return applied[jid(j)]}).length}
+  function stats(){
+    var n=jobs.length,c=function(f){return jobs.filter(f).length};
+    var food=c(function(j){return j.category==='Food manager'});
+    var items=[['Total jobs',n],['Indeed / LinkedIn',c(function(j){return j.source==='Indeed'})+' / '+c(function(j){return j.source==='LinkedIn'})],
+      ['Career-change / Food mgr',(n-food)+' / '+food],['Remote',c(function(j){return j.mode==='Remote'})]];
+    var ul=$('stats');ul.textContent='';
+    items.forEach(function(i){var li=el('li','stat');li.appendChild(el('span','lbl',i[0]));li.appendChild(el('span','num',i[1]));ul.appendChild(li)});
+    var li=el('li','stat');li.appendChild(el('span','lbl','Applied'));var nn=el('span','num',nApplied());nn.id='appliedCount';li.appendChild(nn);ul.appendChild(li);
+    ul.hidden=false;
+  }
+  function chipGroup(id,key,opts){
+    var g=$(id);opts.forEach(function(o){
+      var b=el('button','chip',o);b.type='button';b.id=id+'-'+o.toLowerCase().replace(/\W+/g,'-');
+      b.addEventListener('click',function(){F[key]=o;sync();saveF();render()});
+      g.appendChild(b)});
+  }
+  function sync(){
+    [['g-source','source'],['g-cat','cat'],['g-mode','mode']].forEach(function(p){
+      Array.prototype.forEach.call($(p[0]).children,function(b){b.setAttribute('aria-pressed',String(b.textContent===F[p[1]]))})});
+    $('q').value=F.q;$('hide').checked=F.hide;$('sort').value=F.sort;
+  }
+  function tagRow(cls,label,arr){
+    var d=el('div','tags');if(label)d.appendChild(el('span','lbl',label));
+    arr.forEach(function(x){d.appendChild(el('span','tag',x))});return d;
+  }
+  function card(j){
+    var id=jid(j),li=el('li','card'+(applied[id]?' done':''));
+    var top=el('div','top'),sc=j.score>=85?'hi':j.score>=70?'mid':'lo';
+    var s=el('div','score '+sc);s.appendChild(el('span','num',j.score));s.appendChild(el('span','lbl','% match'));top.appendChild(s);
+    top.appendChild(el('span','pill '+(j.category==='Food manager'?'Food':j.category),j.category));
+    top.appendChild(el('span','lbl src',j.source));li.appendChild(top);
+    var h=el('h3'),a=el('a',null,j.title);a.href=safe(j.url);a.target='_blank';a.rel='noopener';h.appendChild(a);li.appendChild(h);
+    li.appendChild(el('p','co',j.company+' · '+j.location));
+    var f=el('ul','facts');
+    [j.pay,j.mode,'Posted: '+j.posted].forEach(function(t){if(t)f.appendChild(el('li',null,t))});
+    var cm=j.commute==='Easy'?['c-Easy','Easy bus commute']:j.commute==='None'?['c-Easy','No commute (remote)']:j.commute==='Varies'?['c-other','Commute varies: check the bus']:['c-other',(j.commute||'?')+' bus commute'];
+    f.appendChild(el('li',cm[0],cm[1]));li.appendChild(f);
+    if(j.why)li.appendChild(el('p','why',j.why));
+    if(j.matched&&j.matched.length)li.appendChild(tagRow('','You match:',j.matched));
+    if(j.gaps&&j.gaps.length){var g=el('p','gaps');var b=el('span','lbl','Add to resume: ');g.appendChild(b);g.appendChild(document.createTextNode(j.gaps.join(', ')));li.appendChild(g)}
+    if(/unverified|live search/i.test(j.posted||''))li.appendChild(el('p','note','LinkedIn blocks automatic checking; confirm the posting is open.'));
+    var ft=el('div','foot'),ap=el('a','btn primary','Apply');ap.href=safe(j.url);ap.target='_blank';ap.rel='noopener';ft.appendChild(ap);
+    var t=el('button','btn ghost','Applied');t.type='button';t.setAttribute('aria-pressed',String(!!applied[id]));
+    t.addEventListener('click',function(){
+      if(applied[id])delete applied[id];else applied[id]=1;
+      sset(KA,JSON.stringify(applied));$('appliedCount').textContent=nApplied();
+      if(F.hide)render();else{t.setAttribute('aria-pressed',String(!!applied[id]));li.classList.toggle('done',!!applied[id])}});
+    ft.appendChild(t);li.appendChild(ft);return li;
+  }
+  function render(){
+    var q=F.q.trim().toLowerCase();
+    var r=jobs.filter(function(j){
+      if(F.source!=='All'&&j.source!==F.source)return false;
+      if(F.cat!=='All'&&j.category!==F.cat)return false;
+      if(F.mode!=='All'&&j.mode!==F.mode)return false;
+      if(F.hide&&applied[jid(j)])return false;
+      if(q&&(j.title+' '+j.company).toLowerCase().indexOf(q)<0)return false;
+      return true});
+    r.sort(function(a,b){
+      if(F.sort==='new'){var da=isDate(a.posted),db=isDate(b.posted);
+        if(da!==db)return da?-1:1;
+        if(da&&a.posted!==b.posted)return a.posted<b.posted?1:-1}
+      return b.score-a.score});
+    var ul=$('list');ul.textContent='';r.forEach(function(j){ul.appendChild(card(j))});
+    $('empty').hidden=r.length>0;
+    var c=$('count');c.hidden=false;c.textContent='Showing '+r.length+' of '+jobs.length;
+  }
+  function kw(k){
+    if(!k)return;
+    [['k-str','strengths'],['k-it','addForIT'],['k-off','addForOffice']].forEach(function(p){
+      (k[p[1]]||[]).forEach(function(x){$(p[0]).appendChild(el('span','tag',x))})});
+    $('k-tip').textContent=k.tip||'';$('kw').hidden=false;
+  }
+  function fail(){$('err').hidden=false;$('subline').textContent='Update unavailable'}
+  fetch('https://esfxksauvjukswdjnuiv.supabase.co/rest/v1/job_board?id=eq.1&select=data',{cache:'no-cache',headers:{apikey:'sb_publishable_CL1rJcTp4St07C1TEKyc2Q_ZueDynhI'}}).then(function(r){if(!r.ok)throw new Error(r.status);return r.json()}).then(function(rows){var d=rows&&rows[0]&&rows[0].data;
+    if(!d||!Array.isArray(d.jobs))throw new Error('bad');
+    jobs=d.jobs;
+    $('subline').textContent='Updated '+d.updated+' · '+d.searchArea;
+    chipGroup('g-source','source',['All','Indeed','LinkedIn']);
+    chipGroup('g-cat','cat',['All','IT','Office','Nonprofit','Food manager']);
+    chipGroup('g-mode','mode',['All','Remote','Onsite']);
+    $('q').addEventListener('input',function(){F.q=this.value;saveF();render()});
+    $('hide').addEventListener('change',function(){F.hide=this.checked;saveF();render()});
+    $('sort').addEventListener('change',function(){F.sort=this.value;saveF();render()});
+    stats();$('controls').hidden=false;sync();render();kw(d.keywords);
+  }).catch(fail);
+})();
+</script>
+</body>
+</html>
