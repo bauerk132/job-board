@@ -35,7 +35,7 @@ h1{margin:0;font-weight:800;font-size:clamp(36px,9vw,64px);line-height:1;text-tr
 .stripe{height:10px;margin-block:16px 20px;background:repeating-linear-gradient(-45deg,var(--brass) 0 8px,var(--burgundy) 8px 16px)}
 .lbl{text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:14px;color:var(--muted)}
 .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 20px;padding:0;list-style:none}
-@media(min-width:800px){.stats{grid-template-columns:repeat(5,minmax(0,1fr))}}
+@media(min-width:800px){.stats{grid-template-columns:repeat(6,minmax(0,1fr))}}
 .stat{background:var(--surface);border:1px solid var(--line);padding:8px 12px;min-width:0}
 .stat .num{display:block;font-weight:700;font-size:26px;line-height:1.1;color:var(--ink)}
 .stat .num small{font-size:16px;color:var(--muted);font-weight:600}
@@ -63,6 +63,10 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
 .pill.Office{border-color:var(--ink);color:var(--ink)}
 .pill.Nonprofit{background:var(--burgundy);color:var(--on-burgundy)}
 .pill.Food{background:var(--surface-2);color:var(--muted)}
+.pill.Review{background:var(--flare);color:var(--bg)}
+.card.rev{border-color:var(--flare);border-width:2px}
+.revnote{margin:0;font-size:15px;color:var(--ink);background:var(--surface-2);border:1px solid var(--flare);padding:6px 10px}
+.revnote b{color:var(--flare);text-transform:uppercase;letter-spacing:1px;font-family:"Barlow Condensed","Arial Narrow",sans-serif}
 .src{margin-left:auto}
 .card h3{margin:0;font-weight:700;font-size:22px;line-height:1.15;overflow-wrap:anywhere}
 .card h3 a{color:var(--ink);text-decoration-color:var(--brass);text-underline-offset:3px}
@@ -112,6 +116,7 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
       <div class="ctl"><span class="lbl" id="l-source">Source</span><div class="chips" role="group" aria-labelledby="l-source" id="g-source"></div></div>
       <div class="ctl"><span class="lbl" id="l-cat">Category</span><div class="chips" role="group" aria-labelledby="l-cat" id="g-cat"></div></div>
       <div class="ctl"><span class="lbl" id="l-mode">Mode</span><div class="chips" role="group" aria-labelledby="l-mode" id="g-mode"></div></div>
+      <div class="ctl"><span class="lbl" id="l-rev">Review</span><div class="chips" role="group" aria-labelledby="l-rev" id="g-rev"></div></div>
       <div class="ctl"><label class="chk lbl" for="hide"><input type="checkbox" id="hide"> Hide applied</label></div>
       <div class="ctl"><label class="lbl" for="sort">Sort</label><select id="sort"><option value="score">Best match</option><option value="new">Newest</option></select></div>
     </div>
@@ -135,7 +140,7 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
 (function(){
   var $=function(id){return document.getElementById(id)};
   var KA='kyle-jobs-applied',KF='kyle-jobs-filter';
-  var jobs=[],applied={},F={q:'',source:'All',cat:'All',mode:'All',hide:false,sort:'score'};
+  var jobs=[],applied={},F={q:'',source:'All',cat:'All',mode:'All',rev:'All',hide:false,sort:'score'};
   function sget(k){try{return localStorage.getItem(k)}catch(e){return null}}
   function sset(k,v){try{localStorage.setItem(k,v)}catch(e){}}
   function el(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
@@ -150,7 +155,7 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
     var n=jobs.length,c=function(f){return jobs.filter(f).length};
     var food=c(function(j){return j.category==='Food manager'});
     var items=[['Total jobs',n],['Indeed / LinkedIn',c(function(j){return j.source==='Indeed'})+' / '+c(function(j){return j.source==='LinkedIn'})],
-      ['Career-change / Food mgr',(n-food)+' / '+food],['Remote',c(function(j){return j.mode==='Remote'})]];
+      ['Career-change / Food mgr',(n-food)+' / '+food],['Remote',c(function(j){return j.mode==='Remote'})],['Needs review',c(function(j){return !!j.review})]];
     var ul=$('stats');ul.textContent='';
     items.forEach(function(i){var li=el('li','stat');li.appendChild(el('span','lbl',i[0]));li.appendChild(el('span','num',i[1]));ul.appendChild(li)});
     var li=el('li','stat');li.appendChild(el('span','lbl','Applied'));var nn=el('span','num',nApplied());nn.id='appliedCount';li.appendChild(nn);ul.appendChild(li);
@@ -163,7 +168,7 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
       g.appendChild(b)});
   }
   function sync(){
-    [['g-source','source'],['g-cat','cat'],['g-mode','mode']].forEach(function(p){
+    [['g-source','source'],['g-cat','cat'],['g-mode','mode'],['g-rev','rev']].forEach(function(p){
       Array.prototype.forEach.call($(p[0]).children,function(b){b.setAttribute('aria-pressed',String(b.textContent===F[p[1]]))})});
     $('q').value=F.q;$('hide').checked=F.hide;$('sort').value=F.sort;
   }
@@ -172,18 +177,21 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
     arr.forEach(function(x){d.appendChild(el('span','tag',x))});return d;
   }
   function card(j){
-    var id=jid(j),li=el('li','card'+(applied[id]?' done':''));
+    var id=jid(j),li=el('li','card'+(j.review?' rev':'')+(applied[id]?' done':''));
     var top=el('div','top'),sc=j.score>=85?'hi':j.score>=70?'mid':'lo';
     var s=el('div','score '+sc);s.appendChild(el('span','num',j.score));s.appendChild(el('span','lbl','% match'));top.appendChild(s);
     top.appendChild(el('span','pill '+(j.category==='Food manager'?'Food':j.category),j.category));
+    if(j.review)top.appendChild(el('span','pill Review','Needs review'));
     top.appendChild(el('span','lbl src',j.source));li.appendChild(top);
-    var h=el('h3'),a=el('a',null,j.title);a.href=safe(j.url);a.target='_blank';a.rel='noopener';h.appendChild(a);li.appendChild(h);
+    var h=el('h3'),a=el('a',null,String(j.title||'').replace(/^\[Review\]\s*/,''));a.href=safe(j.url);a.target='_blank';a.rel='noopener';h.appendChild(a);li.appendChild(h);
     li.appendChild(el('p','co',j.company+' · '+j.location));
     var f=el('ul','facts');
     [j.pay,j.mode,'Posted: '+j.posted].forEach(function(t){if(t)f.appendChild(el('li',null,t))});
     var cm=j.commute==='Easy'?['c-Easy','Easy bus commute']:j.commute==='None'?['c-Easy','No commute (remote)']:j.commute==='Varies'?['c-other','Commute varies: check the bus']:['c-other',(j.commute||'?')+' bus commute'];
     f.appendChild(el('li',cm[0],cm[1]));li.appendChild(f);
-    if(j.why)li.appendChild(el('p','why',j.why));
+    if(j.review){var rn=el('p','revnote');rn.appendChild(el('b',null,'Check first: '));rn.appendChild(document.createTextNode(j.review));li.appendChild(rn)}
+    var wy=String(j.why||'');if(j.review&&wy.indexOf('Needs review: '+j.review)===0)wy=wy.slice(('Needs review: '+j.review).length).trim();
+    if(wy)li.appendChild(el('p','why',wy));
     if(j.matched&&j.matched.length)li.appendChild(tagRow('','You match:',j.matched));
     if(j.gaps&&j.gaps.length){var g=el('p','gaps');var b=el('span','lbl','Add to resume: ');g.appendChild(b);g.appendChild(document.createTextNode(j.gaps.join(', ')));li.appendChild(g)}
     if(/unverified|live search/i.test(j.posted||''))li.appendChild(el('p','note','LinkedIn blocks automatic checking; confirm the posting is open.'));
@@ -201,6 +209,8 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
       if(F.source!=='All'&&j.source!==F.source)return false;
       if(F.cat!=='All'&&j.category!==F.cat)return false;
       if(F.mode!=='All'&&j.mode!==F.mode)return false;
+      if(F.rev==='Needs review'&&!j.review)return false;
+      if(F.rev==='Hide review'&&j.review)return false;
       if(F.hide&&applied[jid(j)])return false;
       if(q&&(j.title+' '+j.company).toLowerCase().indexOf(q)<0)return false;
       return true});
@@ -227,6 +237,7 @@ input[type=search],select{font:400 16px "Barlow",system-ui,sans-serif;background
     chipGroup('g-source','source',['All','Indeed','LinkedIn']);
     chipGroup('g-cat','cat',['All','IT','Office','Nonprofit','Food manager']);
     chipGroup('g-mode','mode',['All','Remote','Onsite']);
+    chipGroup('g-rev','rev',['All','Needs review','Hide review']);
     $('q').addEventListener('input',function(){F.q=this.value;saveF();render()});
     $('hide').addEventListener('change',function(){F.hide=this.checked;saveF();render()});
     $('sort').addEventListener('change',function(){F.sort=this.value;saveF();render()});
